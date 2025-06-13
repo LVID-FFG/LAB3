@@ -29,7 +29,7 @@ ostream& operator<< (ostream& os, vector<tuple<unsigned long long, vector<int>, 
 }
 
 
-tuple<unsigned long long, vector<int>, vector<int>> generate_N_2(int k, const vector<int>& control){ //k - кол-во множителей, control - вектор простых чисел
+tuple<unsigned long long, vector<int>, vector<int>> generate_N_2(int k, const vector<int>& control){ //k - размер в битах, control - вектор простых чисел
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> random_num(1, 50);
@@ -80,7 +80,7 @@ tuple<unsigned long long, vector<int>, vector<int>> generate_N_2(int k, const ve
     return result;
 }
 
-int test_millera(tuple<unsigned long long, vector<int>, vector<int>>& num, int t){ // 0 - составное, 1 - вероятно простое, 2 - простое
+int test_millera(tuple<unsigned long long, vector<int>, vector<int>>& num, int t){ // 0 - составное, 1 - вероятно составное, 2 - простое
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> random_num(1, 100);
@@ -110,46 +110,39 @@ int test_millera(tuple<unsigned long long, vector<int>, vector<int>>& num, int t
                 break;
             }
         }
-    }
-    if (c < size(q_list)){
-        return 1;
-    } 
-    else {
-        return 2;
-    }
-}
-
-/*void proverka_miller(){
-    vector<tuple<unsigned long long, vector<int>, vector<int>>> test = {{13, {2, 3}, {2, 1}}, {29, {2, 7}, {2, 1}}, {61, {2, 3, 5}, {2, 1, 1}}, {6373, {2, 3, 59}, {2, 3, 1}}};
-    int sost = 0;
-    int  prost = 0;
-    int res = 0;
-    for (tuple<unsigned long long, vector<int>, vector<int>> now : test){
-        for (int i = 0; i < 100000; i++){
-            res = test_millera(now, 1);
-            if (res == 0) sost++;
-            if (res == 1 || res == 2) prost++;
-            //else prost++;
+        if (c == size(t_list)){
+            return 1;
         }
-        cout << get<0>(now) << " " << fixed << setprecision(3)<< sost  << " " << prost << endl;
-        sost = 0;
-        prost = 0;
+        c = 0; 
     }
-}*/
+    return 2;
+}
 
 void miller(int k, int t, int s){ //k - длина числа в битах, t - параметр надёжности теста Миллера, s - количество раундов теста Миллера-Рабина
     vector<int> control = resheto_eratosfena();
+    cout << "Решето Эратосфена:" << endl;
+    cout << control << endl;
     vector<tuple<unsigned long long, vector<int>, vector<int>>> list_of_N; //вектор чисел  N и канонических разложений N-1
     vector<unsigned long long> list_of_only_N;
     tuple<unsigned long long, vector<int>, vector<int>> N;
+    unsigned long iter = 0;
+    int K = 0;
     for (int i = 0, n = 0, test; i < 10;){      //заполняем список числами N
+        if (iter > 5000) {
+            cout << "Больше простых чисел не нашлось" << endl;
+            return;
+        }
+        iter++;
         N = generate_N_2(k, control);
         test = test_millera(N, t);
+        if (test != 2 &&  test_millera_rabina(get<0>(N), s) == "вероятно простое") K++;
         if (test != 0 && (count(list_of_only_N.begin(), list_of_only_N.end(), get<0>(N)) == 0)){
             cout << "По тесту Миллера - ";
             test < 2 ? cout << "скорее всего простое" << endl : cout << "точно простое" << endl;
             cout << "По тесту Миллера-Рабина - ";
             cout << test_millera_rabina(get<0>(N), s) << endl;
+            cout << "k = " << K << endl;
+            K = 0;
             cout << get<0>(N) << endl;
             list_of_N.push_back(N);
             list_of_only_N.push_back(get<0>(N));

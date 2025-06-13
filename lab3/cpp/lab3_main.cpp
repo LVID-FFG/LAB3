@@ -1,10 +1,12 @@
+//g++ -w fun1.cpp fun3.cpp fun4.cpp fun5.cpp general_fun.cpp test_gost.cpp test_Pol.cpp test_miller.cpp lab3_main.cpp; ./a.out; rm a.out
 #include "fun1.h"
-#include "fun2.h"
+#include "test_miller.h"
+#include "test_Pol.h"
+#include "test_gost.h"
 #include "fun3.h"
 #include "fun4.h"
 #include "fun5.h"
 
-#include <windows.h>
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -14,16 +16,12 @@
 using namespace std;
 
 
-
 int main(){
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
-    setlocale(LC_ALL, "russian");
     int x = 0;
     //F1
     double x_n = 0, x_k = 0, stp = 0;
     //F2
-    int bit, t, s;
+    int choice, bit, t, s;
     //F3
     int a, b;
     //F4
@@ -32,7 +30,7 @@ int main(){
     double T, T_s, r;
     int t_max, t_st;
     while (1){
-        cout << "Выберете задание,  для выхода введите 0" << endl << "График - 1"<< endl << "Генератор простых чисел - 2"<< endl << "Ряд - 3"<< endl << "Игра - 4" << endl <<"Кофе - 5" << endl;
+        cout << "Выберете задание,  для выхода введите 0" << endl << "График - 1"<< endl << "Генераторы простых чисел - 2"<< endl << "Ряд - 3"<< endl << "Игра - 4" << endl <<"Кофе - 5" << endl;
         x = 0;
         cin >> x;
         switch (x){
@@ -58,27 +56,74 @@ int main(){
                 fun1(x_n, x_k, stp);
                 break;
             case 2:
-                cout << "Введите длину числа в битах (от 8 до 32)" << endl;
-                cin >> bit;
-                if (cin.fail() || bit < 8 || bit > 32){
+                cout << "Выберете генератор простых чисел \n1 - Миллера, 2 - Полингтона, 3 - ГОСТ" << endl;
+                cin >> choice;
+                if (cin.fail() ||choice < 1 || choice > 3){
                     cout << "Ошибка ввода" << endl;
                     exit(0);
                 }
-                cout << "Введите параметр надёжности теста Миллера" << endl;
-                cin >> t;
-                if (cin.fail() || t <= 0){
-                    cout << "Ошибка ввода" << endl;
-                    exit(0);
+                switch (choice){
+                    case 1:
+                        cout << "Введите размер числа в битах (не более 32)" << endl;
+                        cin >> bit;
+                        if (cin.fail() || bit <= 0 || bit > 32){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        cout << "Введите параметр надёжности теста Миллера" << endl;
+                        cin >> t;
+                        if (cin.fail() || t <= 0){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        cout << "Введите количество раундов теста Миллера-Рабина" << endl;
+                        cin >> s;
+                        if (cin.fail() || s <= 0){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        miller(bit, t, s);
+                        break;
+                    case 2:
+                        cout << "Введите размер числа в битах (не более 32)" << endl;
+                        cin >> bit;
+                        if (cin.fail() || bit <= 0 || bit > 32){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        cout << "Введите параметр надёжности теста Полингтона" << endl;
+                        cin >> t;
+                        if (cin.fail() || t <= 0){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        cout << "Введите количество раундов теста Миллера-Рабина" << endl;
+                        cin >> s;
+                        if (cin.fail() || s <= 0){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        polington(bit, t, s);
+                        break;
+                    case 3:
+                        cout << "Введите размер числа в битах не более 32" << endl;
+                        cin >> bit;
+                        if (cin.fail() || (bit > 32)){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        cout << "Введите количество раундов теста Миллера-Рабина" << endl;
+                        cin >> s;
+                        if (cin.fail() || s <= 0){
+                            cout << "Ошибка ввода" << endl;
+                            exit(0);
+                        }
+                        gost(bit, s);
+                        break;
+                    default:
+                        break;
                 }
-                cout << "Введите количество раундов теста Миллера-Рабина" << endl;
-                cin >> s;
-                if (cin.fail() || s <= 0){
-                    cout << "Ошибка ввода" << endl;
-                    exit(0);
-                }
-                fun2(bit, t, s);
                 break;
-
             case 3:
                 cout << "Введите a, (n^a/b^n)" << endl;
                 cin >> a;
@@ -139,9 +184,10 @@ int main(){
                 fun5(T, T_s, r, t_max, t_st);
                 break;
             default:
+                cout << "Завершение работы" << endl;
                 exit(0);
         }
-
+        cout << endl;
     }
     //fun1(-10, 15, 1); //x начала, х конца, шаг
     //fun2(16, 3, 3); //k - длина числа в битах, t - параметр надёжности теста Миллера, s - количество раундов теста Миллера-Рабина

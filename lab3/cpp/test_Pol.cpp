@@ -10,25 +10,12 @@
 
 using namespace std;
 
-/*ostream& operator<< (ostream& os, vector<auto>& v){
+ostream& operator<< (ostream& os, vector<auto>& v){
     for(auto i : v){
         os << i << " ";
     }
     return os;
 }
-ostream& operator<< (ostream& os, tuple<unsigned long long, vector<int>, vector<int>>& t){
-    os << get<0>(t) << endl;
-    os << get<1>(t) << endl;
-    os << get<2>(t) << endl;
-    return os;
-}
-ostream& operator<< (ostream& os, vector<tuple<unsigned long long, vector<int>, vector<int>>>& v){
-    for(auto i : v){
-        os << i;
-    }
-    return os;
-}*/
-
 
 tuple<unsigned long long, vector<int>, vector<int>> generate_N_3(int k, const vector<int>& control){ //k - длинна числа, control - вектор простых чисел
     random_device rd;
@@ -123,17 +110,30 @@ int test_polington(unsigned long long n, const vector<int>& Q, const vector<int>
 
 void polington(int k, int t, int s = 2){ //k - длина числа в битах, t - параметр надёжности теста Полингтона, s - количество раундов теста Миллера-Рабина
     vector<int> control = resheto_eratosfena();
+    cout << "Решето Эратосфена:" << endl;
+    cout << control << endl;
     vector<tuple<unsigned long long, vector<int>, vector<int>>> list_of_N; //вектор чисел  N и канонических разложений N-1
     vector<unsigned long long> list_of_only_N;
     tuple<unsigned long long, vector<int>, vector<int>> N;
+    unsigned long iter = 0;
+    int K = 0;
     for (int i = 0, test; i < 10;){      //заполняем список числами N
+        if (iter > 5000) {
+            cout << "Больше простых чисел не нашлось" << endl;
+            return;
+        }
+        iter++;
         N = generate_N_3(k, control);
+        K++;
         test = test_polington(get<0>(N), get<1>(N), get<2>(N), t);
+        if (test != 2 &&  test_millera_rabina(get<0>(N), s) == "вероятно простое") K++;
         if (test != 0 && (count(list_of_only_N.begin(), list_of_only_N.end(), get<0>(N)) == 0) && len_in_bit(get<0>(N)) == k){
             cout << "По тесту Полингтона - ";
             test < 2 ? cout << "скорее всего простое" << endl : cout << "точно простое" << endl;
             cout << "По тесту Миллера-Рабина - ";
             cout << test_millera_rabina(get<0>(N), s) << endl;
+            cout << "k = " << K << endl;
+            K = 0;
             //cout << "размер в битах - " << len_in_bit(get<0>(N)) << endl;
             cout << get<0>(N) << endl << endl;
             list_of_N.push_back(N);
@@ -142,21 +142,3 @@ void polington(int k, int t, int s = 2){ //k - длина числа в бита
         }
     }
 }
-
-/*void proverka_polingt(){
-    vector<tuple<unsigned long long, vector<int>, vector<int>>> test = {{13, {2}, {2}}, {29, {7}, {1}}, {61, {3, 5}, {1, 1}}, {6373, {3, 59}, {1, 1}}};
-        int sost = 0;
-        int  prost = 0;
-        int res = 0;
-        for (tuple<unsigned long long, vector<int>, vector<int>> now : test){
-            for (int i = 0; i < 100; i++){
-                res = test_polington(get<0>(now), get<1>(now), get<2>(now), 1);
-                if (res == 0) sost++;
-                if (res == 1 || res == 2) prost++;
-                //else prost++;
-            }
-            cout << get<0>(now) << " " << fixed << setprecision(3)<< sost  << " " << prost << endl;
-            sost = 0;
-            prost = 0;
-        }
-}*/

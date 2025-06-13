@@ -47,13 +47,37 @@ pair<int, int> strat_best_score(int s, int m, vector<int>& posl){ //находи
     return result;
 }
 
+int str_to_int(const string& str){
+    int result = 0;
+    try{
+        if (str[0] == '-'){ //если число отрицательное
+            for(auto i = str.begin()+1; i != str.end(); i++){
+                if (*i < '0' || *i > '9') throw str;
+                result = result*10 + *i - '0';
+            }
+            result *= -1;
+        }else{//если число положительное
+            for(char i : str){
+                if (i < '0' || i > '9') throw str;
+                result = result*10 + i - '0';
+            }
+        }
+    }
+    catch (const string& error){
+        cerr << "Ошибка, вы ввели: "<< error << "а строка должна содержать только число"<< endl;
+        exit(0);
+    }
+    return result;
+}
 
 void fun4(int m){ // m - максимальная длинна хода
     vector<int> posl;
     int s = 0; // сколько чисел зачеркнули
-    int i = 0;
-    cout << "Введите последовательность чисел через пробел, для завершенния ввода введите любую букву и enter" << endl;
-    while(cin >> i){
+    cout << "Введите последовательность чисел через пробел, для завершенния ввода введите end" << endl;
+    string usCin;
+    while(cin >> usCin){
+        if (usCin == "end") break;
+        int i = str_to_int(usCin);
         posl.push_back(i);
     }
     int pavel_score = 0;

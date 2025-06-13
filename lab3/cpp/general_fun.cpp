@@ -38,7 +38,7 @@ vector<int> resheto_eratosfena(){
 }
 
 unsigned long long num_exp(unsigned long a, unsigned long n, unsigned long p){
-    if (a < 1 || n < 1 || p < 1){
+    if (a < 0 || n < 1 || p < 1){
         cout << "Ошибка, числа не должны быть отрицательными" << endl;
         return 0;
     } 
@@ -86,13 +86,6 @@ string test_millera_rabina(unsigned long long n, int k){ //n - число на �
             }
         }
         if (composite) return "составное";
-
-        /*for(int j=0; j < s-1; j++){
-            x = num_exp(x, 2, n);
-            if (x == 1) return "составное";
-            if (x == n-1) continue;
-        }
-        return "составное";*/
     }
     return "вероятно простое";
 }
