@@ -23,55 +23,44 @@ void fun3(int a, int b){ // n^a/b^n
         cout << "infinity" << endl;
         return ;
     }
-    if ((b-1)%5 != 0 && (b-1)%2 != 0 && b-1 != 1 || b-1 == 6){
-        cout << "irrational" << endl;
-        return ;
+    for (int i = 0, n = 0; i < 80000; i++, n++){ //находим примерную сумму ряда 
+        sum += pow(n, a)/pow(b, n);
     }
-    unsigned long long num_h, num_l;
-    switch (a){
-        case 1:
-            num_h = b;
-            num_l = pow((b-1), 2);
-            break;
-        case 2:
-            num_h = b*(b+1);
-            num_l = pow((b-1), 3);
-            break;
-        case 3:
-            num_h = b*(pow(b, 2)+4*b+1);
-            num_l = pow((b-1), 4);
-            break;
-        case 4:
-            num_h = b*(pow(b, 3) +11*pow(b, 2)+11*b+1);
-            num_l = pow((b-1), 5);
-            break;
-        case 5:
-            num_h = b*(pow(b, 4) +26*pow(b, 3)+66*pow(b, 2)+26*b+1);
-            num_l = pow((b-1), 6);
-            break;
-        case 6:
-            num_h = b*(pow(b, 5) +57*pow(b, 4)+302*pow(b, 3)+302*pow(b, 2)+57*b+1);
-            num_l = pow((b-1), 7);
-            break;
-        case 7:
-            num_h = b*(pow(b, 6) + 120*pow(b, 5) + 1191*pow(b, 4) + 2416*pow(b, 3) + 1191*pow(b, 2) + 120*b + 1);
-            num_l = pow((b-1), 8);
-            break;
-        case 8:
-            num_h = b*(pow(b, 7) + 247*pow(b, 6) + 4293*pow(b, 5) + 15619*pow(b, 4) + 15619*pow(b, 3) + 4293*pow(b, 2) + 247*b + 1);
-            num_l = pow((b-1), 9);
-            break;
-        case 9:
-            num_h = b*(pow(b, 8) + 502*pow(b, 7) + 14608*pow(b, 6) + 88234*pow(b, 5) + 156190*pow(b, 4) + 88234*pow(b, 3) + 14608*pow(b, 2) + 502*b + 1);
-            num_l = pow((b-1), 10);
-            break;
-        case 10:
-            num_h = b*(pow(b, 9) + 1013*pow(b, 8) + 47840*pow(b, 7) + 455192*pow(b, 6) + 1310354*pow(b, 5) + 1310354*pow(b, 4) + 455192*pow(b, 3) + 47840*pow(b, 2) + 1013*b + 1);
-            num_l = pow((b-1), 11);
-            break;
-        default:
-            break;
-       }
-    unsigned long long nod = NOD(num_h, num_l);
-    cout << num_h/nod << "/" << num_l/nod << endl;
+
+    unsigned long long sum_H = round(sum * pow(10, 9)); // строим примерную обычную дробь
+    unsigned long long sum_L = pow(10, 9);
+    if (sum_H % 10 == 0){ // если последний знак 0
+        int nod = NOD(sum_H, sum_L);
+        sum_H /= nod;
+        sum_L /= nod;
+        if ((sum_L % 2 == 0 || sum_L % 5 == 0 || sum_L == 1) && sum_L < 10000000){ // если это рациональное число
+            cout  << sum_H << "/" << sum_L << endl;
+            return;
+        }
+        
+    }
+
+    int nod = NOD(sum_H, sum_L);
+    sum_H /= nod;
+    sum_L /= nod;
+    if ((sum_H/10)%10 == 0 && b == 2){ //для чисел вида ***********.00000000000001244 где числитель *************03
+        cout << static_cast<int>(sum) << endl;
+        return;
+    }
+
+    for (int i = 1; i <= 30; i++){// для чисел с знаменателем 2 большой степени
+        if ((static_cast<unsigned long>(round(sum*pow(2, i))*10000) - static_cast<unsigned long>(round(sum*pow(2, i)*10000))) == 0){
+            cout << static_cast<unsigned long>(sum*pow(2, i))<< "/" << static_cast<unsigned long>(pow(2, i)) << endl;
+            return;
+        }
+    }
+    for (int i = 1; i <= 10; i++){ // для чисел с знаменателем 5 большой степени
+        if ((static_cast<unsigned long>(round(sum*pow(5, i))*10000) - static_cast<unsigned long>(round(sum*pow(5, i)*10000))) == 0){
+            cout << static_cast<unsigned long>(sum*pow(5, i))<< "/" << static_cast<unsigned long>(pow(5, i)) << endl;
+            return;
+        }
+    }
+    cout << "irrational" << endl;
+    return;
+
 }
